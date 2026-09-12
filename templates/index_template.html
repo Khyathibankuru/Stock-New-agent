@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Brief — Daily Snapshot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F2; --surface: #FFFFFF; --ink: #201F1B; --ink-soft: #6B6A62;
+    --hairline: #E3E1D8; --teal: #1F4B44; --teal-tint: #EAF1EF;
+    --green: #1E7A4C; --green-tint: #E9F4EE; --red: #A93B2B; --red-tint: #FBECE9;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif; line-height: 1.5; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+  header { margin-bottom: 36px; }
+  header .eyebrow-row { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  h1 { font-family: "Source Serif 4", Georgia, serif; font-weight: 600; font-size: 34px; margin: 0 0 6px; color: var(--teal); }
+  .subtitle { color: var(--ink-soft); font-size: 15px; margin: 0; max-width: 60ch; }
+  .updated { font-size: 13px; color: var(--ink-soft); font-family: "IBM Plex Mono", monospace; }
+  .note { border-left: 3px solid var(--teal); background: var(--teal-tint); padding: 12px 16px; font-size: 14px; color: var(--ink); margin-top: 18px; border-radius: 0 6px 6px 0; }
+  h2.section-title { font-family: "Source Serif 4", Georgia, serif; font-size: 20px; font-weight: 600; color: var(--teal); margin: 44px 0 4px; }
+  h2.section-title:first-of-type { margin-top: 8px; }
+  .section-sub { color: var(--ink-soft); font-size: 13.5px; margin: 0 0 16px; }
+  .articles { display: flex; flex-direction: column; gap: 10px; }
+  .article { display: block; background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px 18px; text-decoration: none; color: var(--ink); }
+  .article:hover { border-color: var(--teal); }
+  .art-title { display: block; font-weight: 500; font-size: 14.5px; margin-bottom: 4px; }
+  .art-meta { display: block; font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--ink-soft); margin-bottom: 6px; }
+  .art-blurb { display: block; font-size: 13px; color: var(--ink-soft); max-width: 68ch; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px; padding: 20px; }
+  .card h3 { font-size: 15px; font-weight: 600; margin: 0 0 4px; color: var(--teal); }
+  .card .card-sub { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 14px; }
+  .stock-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--hairline); font-size: 13.5px; }
+  .stock-row:first-of-type { border-top: none; }
+  .stock-row .name-block { display: flex; flex-direction: column; gap: 2px; }
+  .stock-row .tag { font-size: 11.5px; color: var(--ink-soft); }
+  .stock-row .right-block { display: flex; align-items: center; gap: 8px; }
+  .chg { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; font-weight: 500; white-space: nowrap; padding: 3px 8px; border-radius: 5px; }
+  .up { color: var(--green); background: var(--green-tint); }
+  .down { color: var(--red); background: var(--red-tint); }
+  .flat { color: var(--ink-soft); background: var(--hairline); }
+  .trending { font-size: 10.5px; font-weight: 500; color: var(--teal); background: var(--teal-tint); padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+  .price { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; }
+  .idx-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 16px 0 8px; }
+  .idx-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px 16px; }
+  .idx-card .idx-name { font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
+  .idx-card .idx-val { font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 500; }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--hairline); font-size: 12.5px; color: var(--ink-soft); }
+  @media (max-width: 700px) { .idx-row { grid-template-columns: 1fr 1fr; } .grid2 { grid-template-columns: 1fr; } h1 { font-size: 27px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow-row">
+      <h1>Market brief</h1>
+      <span class="updated">Session: {{ session_date }}</span>
+    </div>
+    <p class="subtitle">News first, stocks after — global, India, then gas &amp; metals.</p>
+    {% if headline_note %}<div class="note">{{ headline_note }}</div>{% endif %}
+  </header>
+
+  <h2 class="section-title">Global — top 5</h2>
+  <p class="section-sub">News that could move markets broadly today.</p>
+  <div class="articles">
+    {% for a in global_top5 %}
+    <a class="article" href="{{ a.link }}" target="_blank" rel="noopener">
+      <span class="art-title">{{ a.title }}</span>
+      <span class="art-meta">{{ a.source }}{% if a.published %} · {{ a.published }}{% endif %}</span>
+      <span class="art-blurb">{{ a.blurb }}</span>
+    </a>
+    {% endfor %}
+  </div>
+
+  <h2 class="section-title">India — top 10</h2>
+  <p class="section-sub">Most likely to move Sensex &amp; Nifty this week.</p>
+  <div class="articles">
+    {% for a in india_top10 %}
+    <a class="article" href="{{ a.link }}" target="_blank" rel="noopener">
+      <span class="art-title">{{ a.title }}</span>
+      <span class="art-meta">{{ a.source }}{% if a.published %} · {{ a.published }}{% endif %}</span>
+      <span class="art-blurb">{{ a.blurb }}</span>
+    </a>
+    {% endfor %}
+  </div>
+
+  <h2 class="section-title">Gas &amp; metals — top 5</h2>
+  <p class="section-sub">Energy and metals movers worth tracking on their own.</p>
+  <div class="articles">
+    {% for a in metal_gas_top5 %}
+    <a class="article" href="{{ a.link }}" target="_blank" rel="noopener">
+      <span class="art-title">{{ a.title }}</span>
+      <span class="art-meta">{{ a.source }}{% if a.published %} · {{ a.published }}{% endif %}</span>
+      <span class="art-blurb">{{ a.blurb }}</span>
+    </a>
+    {% endfor %}
+  </div>
+
+  <h2 class="section-title">Indices</h2>
+  <p class="section-sub">Latest levels — the anchor numbers behind everything below.</p>
+  <div class="idx-row">
+    {% for idx in indices %}
+    <div class="idx-card">
+      <div class="idx-name">{{ idx.name }}</div>
+      <div class="idx-val">{{ idx.value }}</div>
+      <span class="chg {{ idx.direction }}">{{ idx.change_display }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <h2 class="section-title">Stocks</h2>
+  <p class="section-sub">Your watchlist, with live price, % change, and a flag for names getting mentioned in today's news.</p>
+  <div class="grid2">
+    <div class="card">
+      <h3>Watchlist — India</h3>
+      <p class="card-sub">Price &amp; change, sourced live</p>
+      {% for s in india_stocks %}
+      <div class="stock-row">
+        <div class="name-block"><span>{{ s.name }}</span><span class="tag">{{ s.tag }}</span></div>
+        <div class="right-block">
+          {% if s.trending %}<span class="trending">trending</span>{% endif %}
+          <span class="price">{{ s.price }}</span>
+          <span class="chg {{ s.direction }}">{{ s.change_display }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="card">
+      <h3>Metal &amp; gas sector</h3>
+      <p class="card-sub">India-listed names to watch</p>
+      {% for s in metal_gas_stocks %}
+      <div class="stock-row">
+        <div class="name-block"><span>{{ s.name }}</span><span class="tag">{{ s.tag }}</span></div>
+        <div class="right-block">
+          {% if s.trending %}<span class="trending">trending</span>{% endif %}
+          <span class="price">{{ s.price }}</span>
+          <span class="chg {{ s.direction }}">{{ s.change_display }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <h2 class="section-title">Trending now</h2>
+  <p class="section-sub">Names getting mentioned repeatedly across today's fetched news — attention, not a buy/sell signal.</p>
+  <div class="grid2">
+    <div class="card">
+      <h3>Trending — India</h3>
+      <p class="card-sub">Mentioned across today's India/metal/gas feeds</p>
+      {% for s in trending_india %}
+      <div class="stock-row">
+        <div class="name-block"><span>{{ s.name }}</span><span class="tag">{{ s.tag }}</span></div>
+        <div class="right-block"><span class="price">{{ s.price }}</span><span class="chg {{ s.direction }}">{{ s.change_display }}</span></div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="card">
+      <h3>Trending — global</h3>
+      <p class="card-sub">Mentioned across today's global feeds</p>
+      {% for s in trending_global %}
+      <div class="stock-row">
+        <div class="name-block"><span>{{ s.name }}</span><span class="tag">{{ s.tag }}</span></div>
+        <div class="right-block"><span class="price">{{ s.price }}</span><span class="chg {{ s.direction }}">{{ s.change_display }}</span></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <footer>
+    Informational snapshot only — not investment advice. Generated automatically at {{ generated_at }}.
+  </footer>
+
+</div>
+</body>
+</html>

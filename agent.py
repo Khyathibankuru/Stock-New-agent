@@ -27,7 +27,8 @@ from jinja2 import Environment, FileSystemLoader
 # ----------------------------------------------------------------------
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-2.0-flash"  # plain text generation, free-tier friendly
+GEMINI_MODEL = "gemini-flash-latest"  # Google's alias for the current stable Flash model —
+                                       # avoids 404s when a specific version (e.g. 2.0) is retired
 GEMINI_URL = (
     f"https://generativelanguage.googleapis.com/v1beta/models/"
     f"{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
@@ -312,13 +313,17 @@ def send_telegram_message(text):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("[warn] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set — skipping Telegram send")
         return
+    # TELEGRAM_CHAT_ID can hold one ID or several comma-separated IDs,
+    # e.g. "111111111,222222222" — the message goes out to each one.
+    chat_ids = [c.strip() for c in TELEGRAM_CHAT_ID.split(",") if c.strip()]
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    try:
-        r = requests.post(url, json={"chat_id": TELEGRAM_CHAT_ID, "text": text, "disable_web_page_preview": False}, timeout=30)
-        r.raise_for_status()
-        print("[ok] Telegram message sent")
-    except Exception as ex:
-        print(f"[warn] Telegram send failed: {ex}")
+    for chat_id in chat_ids:
+        try:
+            r = requests.post(url, json={"chat_id": chat_id, "text": text, "disable_web_page_preview": False}, timeout=30)
+            r.raise_for_status()
+            print(f"[ok] Telegram message sent to {chat_id}")
+        except Exception as ex:
+            print(f"[warn] Telegram send failed for {chat_id}: {ex}")
 
 
 # ----------------------------------------------------------------------
